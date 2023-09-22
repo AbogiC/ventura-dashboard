@@ -16,6 +16,7 @@
 
 */
 import Dashboard from "views/Dashboard.js";
+import Expenses from "views/Expenses.js";
 import Icons from "views/Icons.js";
 import Map from "views/Map.js";
 import Notifications from "views/Notifications.js";
@@ -31,6 +32,14 @@ var routes = [
     rtlName: "لوحة القيادة",
     icon: "tim-icons icon-chart-pie-36",
     component: <Dashboard />,
+    layout: "/admin",
+  },
+  {
+    path: "/expenses",
+    name: "Expenses",
+    rtlName: "لوحة القيادة",
+    icon: "tim-icons icon-bank",
+    component: <Expenses />,
     layout: "/admin",
   },
   {
