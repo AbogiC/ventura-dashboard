@@ -26,8 +26,9 @@ import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [justifyActive, setJustifyActive] = useState("tab1");
+  const [countData, setCountData] = useState(0);
 
-  const handleJustifyClick = value => {
+  const handleJustifyClick = (value) => {
     if (value === justifyActive) {
       return;
     }
@@ -39,7 +40,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSignIn = async e => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
     const email = e.target[0].value;
     const password = e.target[1].value;
@@ -52,6 +53,18 @@ function Login() {
     }
   };
 
+  // get user total data in google sheet
+  fetch(api)
+    .then((response) => response.json())
+    .then((data) => {
+      const totalData = data.length;
+      setCountData(totalData);
+      console.log(data);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+
   const createGoogleSheet = (
     fullName,
     userName,
@@ -63,29 +76,34 @@ function Login() {
   ) => {
     fetch(api + personalInfoSheet, {
       method: "POST",
+      mode: "cors",
       headers: {
-        Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        data: [
-          {
-            id: "INCREMENT",
-            fullName: fullName,
-            userName: userName,
-            emailAddress: email,
-            phoneNumber: phone,
-            gender: gender,
-            dateBirth: dateOfBirth,
-            createdBy: userName,
-            createdDate: createDate,
-            rowStatus: 1,
-          },
-        ],
-      }),
+      body: JSON.stringify([
+        {
+          id: countData + 1,
+          fullName: fullName,
+          userName: userName,
+          emailAddress: email,
+          phoneNumber: phone,
+          gender: gender,
+          dateBirth: dateOfBirth,
+          createdBy: userName,
+          createdDate: createDate,
+          rowStatus: 1,
+        },
+      ]),
     })
-      .then(response => response.json())
-      .then(data => console.log(data));
+      .then((r) => r.json())
+      .then((data) => {
+        // The response comes here
+        console.log(data);
+      })
+      .catch((error) => {
+        // Errors are reported there
+        console.log(error);
+      });
   };
 
   const currentDate = new Date();
@@ -101,7 +119,7 @@ function Login() {
     currentDate
   );
 
-  const handleSignUp = async e => {
+  const handleSignUp = async (e) => {
     setLoading(true);
     e.preventDefault();
     const fullName = e.target[0].value;
@@ -112,12 +130,15 @@ function Login() {
     const dateOfBirth = e.target[5].value;
     const password = e.target[6].value;
 
-    const birthFormat = new Date(dateOfBirth);
+    const birthDate = new Date(dateOfBirth);
+    const formattedBirth = new Intl.DateTimeFormat("en-US", options).format(
+      birthDate
+    );
 
     try {
       // create authentication in firebase
       const res = await createUserWithEmailAndPassword(auth, email, password);
-      // don't forget to check rules in cloud firestore
+      // don't forget to update rules firebase
       await setDoc(doc(db, "userProfile", res.user.uid), {
         uid: res.user.uid,
         fullName: fullName,
@@ -125,8 +146,10 @@ function Login() {
         emailAddress: email,
         phoneNumber: phone,
         gender: gender,
-        dateBirth: birthFormat,
-        rowStatus: true,
+        dateBirth: formattedBirth,
+        createdBy: userName,
+        createdDate: formattedDate,
+        rowStatus: 1,
       });
 
       // save user data in google sheets
@@ -152,18 +175,21 @@ function Login() {
       <MDBTabs
         pills
         justify
-        className="mb-3 d-flex flex-row justify-content-between">
+        className="mb-3 d-flex flex-row justify-content-between"
+      >
         <MDBTabsItem>
           <MDBTabsLink
             onClick={() => handleJustifyClick("tab1")}
-            active={justifyActive === "tab1"}>
+            active={justifyActive === "tab1"}
+          >
             Login
           </MDBTabsLink>
         </MDBTabsItem>
         <MDBTabsItem>
           <MDBTabsLink
             onClick={() => handleJustifyClick("tab2")}
-            active={justifyActive === "tab2"}>
+            active={justifyActive === "tab2"}
+          >
             Register
           </MDBTabsLink>
         </MDBTabsItem>
@@ -176,12 +202,14 @@ function Login() {
 
             <div
               className="d-flex justify-content-between mx-auto"
-              style={{ width: "40%" }}>
+              style={{ width: "40%" }}
+            >
               <MDBBtn
                 tag="a"
                 color="none"
                 className="m-1"
-                style={{ color: "#1266f1" }}>
+                style={{ color: "#1266f1" }}
+              >
                 <MDBIcon fab icon="facebook-f" size="sm" />
               </MDBBtn>
 
@@ -189,7 +217,8 @@ function Login() {
                 tag="a"
                 color="none"
                 className="m-1"
-                style={{ color: "#1266f1" }}>
+                style={{ color: "#1266f1" }}
+              >
                 <MDBIcon fab icon="twitter" size="sm" />
               </MDBBtn>
 
@@ -197,7 +226,8 @@ function Login() {
                 tag="a"
                 color="none"
                 className="m-1"
-                style={{ color: "#1266f1" }}>
+                style={{ color: "#1266f1" }}
+              >
                 <MDBIcon fab icon="google" size="sm" />
               </MDBBtn>
 
@@ -205,7 +235,8 @@ function Login() {
                 tag="a"
                 color="none"
                 className="m-1"
-                style={{ color: "#1266f1" }}>
+                style={{ color: "#1266f1" }}
+              >
                 <MDBIcon fab icon="github" size="sm" />
               </MDBBtn>
             </div>
@@ -243,12 +274,14 @@ function Login() {
 
             <div
               className="d-flex justify-content-between mx-auto"
-              style={{ width: "40%" }}>
+              style={{ width: "40%" }}
+            >
               <MDBBtn
                 tag="a"
                 color="none"
                 className="m-1"
-                style={{ color: "#1266f1" }}>
+                style={{ color: "#1266f1" }}
+              >
                 <MDBIcon fab icon="facebook-f" size="sm" />
               </MDBBtn>
 
@@ -256,7 +289,8 @@ function Login() {
                 tag="a"
                 color="none"
                 className="m-1"
-                style={{ color: "#1266f1" }}>
+                style={{ color: "#1266f1" }}
+              >
                 <MDBIcon fab icon="twitter" size="sm" />
               </MDBBtn>
 
@@ -264,7 +298,8 @@ function Login() {
                 tag="a"
                 color="none"
                 className="m-1"
-                style={{ color: "#1266f1" }}>
+                style={{ color: "#1266f1" }}
+              >
                 <MDBIcon fab icon="google" size="sm" />
               </MDBBtn>
 
@@ -272,7 +307,8 @@ function Login() {
                 tag="a"
                 color="none"
                 className="m-1"
-                style={{ color: "#1266f1" }}>
+                style={{ color: "#1266f1" }}
+              >
                 <MDBIcon fab icon="github" size="sm" />
               </MDBBtn>
             </div>

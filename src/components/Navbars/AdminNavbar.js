@@ -15,7 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
+import React, { useEffect } from "react";
 // nodejs library that concatenates classes
 import classNames from "classnames";
 
@@ -44,11 +44,13 @@ import { useContext } from "react";
 
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase";
+import { api } from "api/Api";
 
 function AdminNavbar(props) {
   const [collapseOpen, setcollapseOpen] = React.useState(false);
   const [modalSearch, setmodalSearch] = React.useState(false);
   const [color, setcolor] = React.useState("navbar-transparent");
+  const [username, setUsername] = React.useState(null);
   React.useEffect(() => {
     window.addEventListener("resize", updateColor);
     // Specify how to clean up after this effect:
@@ -80,6 +82,21 @@ function AdminNavbar(props) {
 
   // this function is to get auth from firebase
   const { currentUser } = useContext(AuthContext);
+
+  useEffect(() => {
+    fetch(api)
+      .then((response) => response.json())
+      .then((data) => {
+        const userRow = data.find(
+          (user) => user.emailAddress === currentUser.email
+        );
+        setUsername(userRow.userName);
+        console.log(data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, [currentUser]);
 
   return (
     <>
@@ -164,7 +181,7 @@ function AdminNavbar(props) {
                     <img alt="..." src={require("assets/img/anime3.png")} />
                   </div>
                   <b className="caret d-none d-lg-block d-xl-block" />
-                  <p className="d-lg-none">{currentUser.email}</p>
+                  <p className="d-lg-none">{username}</p>
                 </DropdownToggle>
                 <DropdownMenu className="dropdown-navbar" right tag="ul">
                   <NavLink tag="li">
