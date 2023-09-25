@@ -39,6 +39,12 @@ import {
   ModalHeader,
 } from "reactstrap";
 
+import { AuthContext } from "contexts/AuthContext";
+import { useContext } from "react";
+
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase";
+
 function AdminNavbar(props) {
   const [collapseOpen, setcollapseOpen] = React.useState(false);
   const [modalSearch, setmodalSearch] = React.useState(false);
@@ -71,6 +77,10 @@ function AdminNavbar(props) {
   const toggleModalSearch = () => {
     setmodalSearch(!modalSearch);
   };
+
+  // this function is to get auth from firebase
+  const { currentUser } = useContext(AuthContext);
+
   return (
     <>
       <Navbar className={classNames("navbar-absolute", color)} expand="lg">
@@ -154,7 +164,7 @@ function AdminNavbar(props) {
                     <img alt="..." src={require("assets/img/anime3.png")} />
                   </div>
                   <b className="caret d-none d-lg-block d-xl-block" />
-                  <p className="d-lg-none">Log out</p>
+                  <p className="d-lg-none">{currentUser.email}</p>
                 </DropdownToggle>
                 <DropdownMenu className="dropdown-navbar" right tag="ul">
                   <NavLink tag="li">
@@ -165,7 +175,12 @@ function AdminNavbar(props) {
                   </NavLink>
                   <DropdownItem divider tag="li" />
                   <NavLink tag="li">
-                    <DropdownItem className="nav-item">Log out</DropdownItem>
+                    <DropdownItem
+                      className="nav-item"
+                      onClick={() => signOut(auth)}
+                    >
+                      Log out
+                    </DropdownItem>
                   </NavLink>
                 </DropdownMenu>
               </UncontrolledDropdown>

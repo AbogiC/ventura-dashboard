@@ -12,11 +12,17 @@ import {
   MDBCheckbox,
 } from "mdb-react-ui-kit";
 
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { Button } from "reactstrap";
+
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
 import { auth, db } from "../../firebase.js";
 import { doc, setDoc } from "firebase/firestore";
+import { api, personalInfoSheet } from "api/Api.js";
 
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [justifyActive, setJustifyActive] = useState("tab1");
@@ -33,22 +39,108 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async e => {
-    setLoading(true);
+  const handleSignIn = async e => {
     e.preventDefault();
-    const displayName = e.target[0].value;
-    const email = e.target[1].value;
-    const password = e.target[2].value;
+    const email = e.target[0].value;
+    const password = e.target[1].value;
 
     try {
-      const res = await createUserWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate("/admin/dashboard");
+    } catch (err) {
+      setErr(true);
+    }
+  };
 
-      await setDoc(doc(db, "users", res.user.uid), {
+  const createGoogleSheet = (
+    fullName,
+    userName,
+    email,
+    phone,
+    gender,
+    dateOfBirth,
+    createDate
+  ) => {
+    fetch(api + personalInfoSheet, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        data: [
+          {
+            id: "INCREMENT",
+            fullName: fullName,
+            userName: userName,
+            emailAddress: email,
+            phoneNumber: phone,
+            gender: gender,
+            dateBirth: dateOfBirth,
+            createdBy: userName,
+            createdDate: createDate,
+            rowStatus: 1,
+          },
+        ],
+      }),
+    })
+      .then(response => response.json())
+      .then(data => console.log(data));
+  };
+
+  const currentDate = new Date();
+  const options = {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+
+  const formattedDate = new Intl.DateTimeFormat("en-US", options).format(
+    currentDate
+  );
+
+  const handleSignUp = async e => {
+    setLoading(true);
+    e.preventDefault();
+    const fullName = e.target[0].value;
+    const userName = e.target[1].value;
+    const email = e.target[2].value;
+    const phone = e.target[3].value;
+    const gender = e.target[4].value;
+    const dateOfBirth = e.target[5].value;
+    const password = e.target[6].value;
+
+    const birthFormat = new Date(dateOfBirth);
+
+    try {
+      // create authentication in firebase
+      const res = await createUserWithEmailAndPassword(auth, email, password);
+      // don't forget to check rules in cloud firestore
+      await setDoc(doc(db, "userProfile", res.user.uid), {
         uid: res.user.uid,
-        displayName,
-        email,
+        fullName: fullName,
+        userName: userName,
+        emailAddress: email,
+        phoneNumber: phone,
+        gender: gender,
+        dateBirth: birthFormat,
+        rowStatus: true,
       });
-      navigate("/");
+
+      // save user data in google sheets
+      createGoogleSheet(
+        fullName,
+        userName,
+        email,
+        phone,
+        gender,
+        dateOfBirth,
+        formattedDate
+      );
+
+      navigate("/admin/dashboard");
     } catch (err) {
       setErr(true);
       setLoading(false);
@@ -121,24 +213,28 @@ function Login() {
             <p className="text-center mt-3">or:</p>
           </div>
 
-          <MDBInput
-            wrapperClass="mb-4"
-            label="Email address"
-            id="form1"
-            type="email"
-          />
-          <MDBInput
-            wrapperClass="mb-4"
-            label="Password"
-            id="form2"
-            type="password"
-          />
+          <form onSubmit={handleSignIn}>
+            <MDBInput
+              wrapperClass="mb-4"
+              label="Email address"
+              id="form1"
+              type="email"
+            />
+            <MDBInput
+              wrapperClass="mb-4"
+              label="Password"
+              id="form2"
+              type="password"
+            />
 
-          <div className="d-flex justify-content-between mx-4 mb-4">
-            <a href="!#">Forgot password?</a>
-          </div>
+            <div className="d-flex justify-content-between mx-4 mb-4">
+              <a href="!#">Forgot password?</a>
+            </div>
 
-          <MDBBtn className="mb-4 w-100">Sign in</MDBBtn>
+            <Button className="mb-4 w-100" type="submit">
+              Sign in
+            </Button>
+          </form>
         </MDBTabsPane>
 
         <MDBTabsPane show={justifyActive === "tab2"}>
@@ -184,29 +280,63 @@ function Login() {
             <p className="text-center mt-3">or:</p>
           </div>
 
-          <MDBInput
-            wrapperClass="mb-4"
-            label="Username"
-            id="form1"
-            type="text"
-          />
-          <MDBInput wrapperClass="mb-4" label="Email" id="form1" type="email" />
-          <MDBInput
-            wrapperClass="mb-4"
-            label="Password"
-            id="form1"
-            type="password"
-          />
-
-          <div className="d-flex justify-content-center mb-4">
-            <MDBCheckbox
-              name="flexCheck"
-              id="flexCheckDefault"
-              label="I have read and agree to the terms"
+          <form onSubmit={handleSignUp}>
+            <MDBInput
+              wrapperClass="mb-4"
+              label="Full Name"
+              id="fullname"
+              type="text"
             />
-          </div>
+            <MDBInput
+              wrapperClass="mb-4"
+              label="Username"
+              id="username"
+              type="text"
+            />
+            <MDBInput
+              wrapperClass="mb-4"
+              label="Email"
+              id="email"
+              type="email"
+            />
+            <MDBInput
+              wrapperClass="mb-4"
+              label="Phone"
+              id="phone"
+              type="number"
+            />
+            <MDBInput
+              wrapperClass="mb-4"
+              label="Gender"
+              id="gender"
+              type="text"
+            />
+            <MDBInput
+              wrapperClass="mb-4"
+              label="Date of Birth"
+              id="dateofbirth"
+              type="date"
+            />
+            <MDBInput
+              wrapperClass="mb-4"
+              label="Password"
+              id="password"
+              type="password"
+            />
 
-          <MDBBtn className="mb-4 w-100">Sign up</MDBBtn>
+            <div className="d-flex justify-content-center mb-4">
+              <MDBCheckbox
+                name="flexCheck"
+                id="flexCheckDefault"
+                label="I have read and agree to the terms"
+              />
+            </div>
+            <Button disabled={loading} type="submit" className="mb-4 w-100">
+              Sign up
+            </Button>
+            {loading && "please wait..."}
+            {err && <span>Something went wrong</span>}
+          </form>
         </MDBTabsPane>
       </MDBTabsContent>
     </MDBContainer>
