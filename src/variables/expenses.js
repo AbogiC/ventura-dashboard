@@ -1,12 +1,21 @@
-export const data = {
-  labels: ["Red", "Green", "Yellow"],
-  datasets: [
-    {
-      data: [300, 50, 100],
-      backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
-      hoverBackgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
-    },
-  ],
+import { api, expenseInfoSheet } from "api/Api";
+import React from "react";
+
+export const useExpenseData = () => {
+  // get expense data
+  const [output, setOutput] = React.useState([]);
+  React.useEffect(() => {
+    fetch(api + expenseInfoSheet)
+      .then(response => response.json())
+      .then(data => {
+        setOutput(data);
+        console.log("how much it called");
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }, []);
+  return output;
 };
 
 export const options = {

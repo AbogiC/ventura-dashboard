@@ -12,19 +12,17 @@ import {
 } from "reactstrap";
 
 import { Pie } from "react-chartjs-2";
-import { api, expenseInfoSheet } from "api/Api.js";
 import { options } from "variables/expenses.js";
 
-const ExpenseGraph = () => {
+function ExpenseGraph({ totalExpenseData }) {
   const [changeWallet, setChangeWallet] = React.useState();
-  const [totalData, setTotalData] = React.useState([]);
   const [dataChart, setDataChart] = React.useState({
-    labels: ["Red", "Blue", "Yellow"],
+    labels: ["Expense", "Income"],
     datasets: [
       {
-        data: [300, 50, 100],
-        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
-        hoverBackgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
+        data: [0, 0],
+        backgroundColor: ["#FF6384", "#36A2EB"],
+        hoverBackgroundColor: ["#FF6384", "#36A2EB"],
       },
     ],
   });
@@ -39,17 +37,7 @@ const ExpenseGraph = () => {
   ];
   const symbolWallet = ["A", "B", "C", "D", "E", "F"];
 
-  // get expense data
-  React.useEffect(() => {
-    fetch(api + expenseInfoSheet)
-      .then(response => response.json())
-      .then(data => {
-        setTotalData(data);
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  }, []);
+  const totalData = totalExpenseData;
 
   const changeWalletName = name => {
     const filterWallet = totalData.filter(item => item.walletName === name);
@@ -142,6 +130,6 @@ const ExpenseGraph = () => {
       </Card>
     </div>
   );
-};
+}
 
 export default ExpenseGraph;
