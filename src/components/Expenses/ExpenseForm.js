@@ -32,12 +32,14 @@ const ExpenseForm = () => {
   const [isRequired3, setIsRequired3] = React.useState(false);
   const [isRequired4, setIsRequired4] = React.useState(false);
   const [isRequired5, setIsRequired5] = React.useState(false);
+  const [isRequired6, setIsRequired6] = React.useState(false);
 
   const [isValid, setIsValid] = React.useState(false);
   const [isValid2, setIsValid2] = React.useState(false);
   const [isValid3, setIsValid3] = React.useState(false);
   const [isValid4, setIsValid4] = React.useState(false);
   const [isValid5, setIsValid5] = React.useState(false);
+  const [isValid6, setIsValid6] = React.useState(false);
 
   const toggleShow = () => setShowShow(!showShow);
 
@@ -81,6 +83,16 @@ const ExpenseForm = () => {
     } else if (expenseChange.trim() !== "") {
       setIsRequired4(false);
       setIsValid4(true);
+    }
+  };
+  const handleChangeDate = event => {
+    const expenseDate = event.target.value;
+    if (expenseDate.trim() === "") {
+      setIsRequired6(true);
+      setIsValid6(false);
+    } else if (expenseDate.trim() !== "") {
+      setIsRequired6(false);
+      setIsValid6(true);
     }
   };
 
@@ -140,7 +152,8 @@ const ExpenseForm = () => {
     amount,
     expenseName,
     categoryName,
-    expenseType
+    expenseIncome,
+    expenseDate
   ) => {
     fetch(api + expenseInfoSheet, {
       method: "POST",
@@ -154,8 +167,9 @@ const ExpenseForm = () => {
             id: "INCREMENT",
             expense: expenseName,
             category: categoryName,
-            expenseType: expenseType,
+            expenseType: expenseIncome,
             walletName: walletName,
+            expenseDate: expenseDate,
             amount: amount,
             createdBy: currentUser.email,
             createdDate: formattedDate,
@@ -188,13 +202,14 @@ const ExpenseForm = () => {
   const handleFormExpense = async e => {
     setLoading(true);
     e.preventDefault();
-    const expenseType = e.target[0].value;
+    const expenseIncome = e.target[0].value;
     const walletName = e.target[1].value;
-    const amount = e.target[2].value;
-    const expenseName = e.target[3].value;
-    const categoryName = e.target[4].value;
+    const expenseDate = e.target[2].value;
+    const amount = e.target[3].value;
+    const expenseName = e.target[4].value;
+    const categoryName = e.target[5].value;
 
-    if (isValid && isValid2 && isValid3 && isValid4 && isValid5) {
+    if (isValid && isValid2 && isValid3 && isValid4 && isValid5 && isValid6) {
       try {
         // save user data in google sheets
         createExpenseData(
@@ -202,7 +217,8 @@ const ExpenseForm = () => {
           amount,
           expenseName,
           categoryName,
-          expenseType
+          expenseIncome,
+          expenseDate
         );
       } catch (err) {
         setLoading(false);
@@ -233,7 +249,7 @@ const ExpenseForm = () => {
           <MDBCollapse show={showShow}>
             <Form onSubmit={handleFormExpense}>
               <Row>
-                <Col className="pr-md-1" md="6">
+                <Col className="pr-md-1" md="4">
                   <FormGroup>
                     <label>Type Expense</label>
                     <Input
@@ -255,7 +271,7 @@ const ExpenseForm = () => {
                     </Input>
                   </FormGroup>
                 </Col>
-                <Col className="pl-md-1" md="6">
+                <Col className="pl-md-1" md="4">
                   <FormGroup>
                     <label>Wallet</label>
                     <Input
@@ -275,6 +291,19 @@ const ExpenseForm = () => {
                         </option>
                       ))}
                     </Input>
+                  </FormGroup>
+                </Col>
+                <Col className="pl-md-1" md="4">
+                  <FormGroup>
+                    <label>Date</label>
+                    <Input
+                      defaultValue=""
+                      placeholder="input date"
+                      type="date"
+                      onChange={handleChangeDate}
+                      invalid={isRequired6}
+                      valid={isValid6}
+                    />
                   </FormGroup>
                 </Col>
               </Row>
