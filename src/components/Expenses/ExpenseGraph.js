@@ -8,6 +8,7 @@ import {
   Card,
   CardHeader,
   CardTitle,
+  CardBody,
 } from "reactstrap";
 
 import { Pie } from "react-chartjs-2";
@@ -15,7 +16,8 @@ import { api, expenseInfoSheet } from "api/Api.js";
 import { options } from "variables/expenses.js";
 
 const ExpenseGraph = () => {
-  const [changeWallet, setChangeWallet] = React.useState("ABC-BCA");
+  const [changeWallet, setChangeWallet] = React.useState();
+  const [totalData, setTotalData] = React.useState([]);
   const [dataChart, setDataChart] = React.useState({
     labels: ["Red", "Blue", "Yellow"],
     datasets: [
@@ -42,54 +44,50 @@ const ExpenseGraph = () => {
     fetch(api + expenseInfoSheet)
       .then(response => response.json())
       .then(data => {
-        const filterWallet = data.filter(
-          item => item.walletName === changeWallet
-        );
-        const filterExpense = filterWallet.filter(
-          item => item.expenseType === "Expense"
-        );
-        const filterIncome = filterWallet.filter(
-          item => item.expenseType === "Income"
-        );
-        const expenseAmount = filterExpense.map(item => item.amount);
-        const incomeAmount = filterIncome.map(item => item.amount);
-        const totalExpense = expenseAmount.reduce(
-          (accumulator, currentValue) => {
-            const amount = parseFloat(currentValue);
-            if (!isNaN(amount)) {
-              return accumulator + amount;
-            }
-
-            return accumulator;
-          },
-          0
-        );
-        const totalIncome = incomeAmount.reduce((accumulator, currentValue) => {
-          const amount = parseFloat(currentValue);
-          if (!isNaN(amount)) {
-            return accumulator + amount;
-          }
-
-          return accumulator;
-        }, 0);
-        const setData = {
-          labels: ["Expense", "Income"],
-          datasets: [
-            {
-              data: [totalExpense, totalIncome],
-              backgroundColor: ["#FF6384", "#36A2EB"],
-              hoverBackgroundColor: ["#FF6384", "#36A2EB"],
-            },
-          ],
-        };
-        setDataChart(setData);
+        setTotalData(data);
       })
       .catch(error => {
         console.error(error);
       });
-  }, [changeWallet]);
+  }, []);
 
   const changeWalletName = name => {
+    const filterWallet = totalData.filter(item => item.walletName === name);
+    const filterExpense = filterWallet.filter(
+      item => item.expenseType === "Expense"
+    );
+    const filterIncome = filterWallet.filter(
+      item => item.expenseType === "Income"
+    );
+    const expenseAmount = filterExpense.map(item => item.amount);
+    const incomeAmount = filterIncome.map(item => item.amount);
+    const totalExpense = expenseAmount.reduce((accumulator, currentValue) => {
+      const amount = parseFloat(currentValue);
+      if (!isNaN(amount)) {
+        return accumulator + amount;
+      }
+
+      return accumulator;
+    }, 0);
+    const totalIncome = incomeAmount.reduce((accumulator, currentValue) => {
+      const amount = parseFloat(currentValue);
+      if (!isNaN(amount)) {
+        return accumulator + amount;
+      }
+
+      return accumulator;
+    }, 0);
+    const setData = {
+      labels: ["Expense", "Income"],
+      datasets: [
+        {
+          data: [totalExpense, totalIncome],
+          backgroundColor: ["#FF6384", "#36A2EB"],
+          hoverBackgroundColor: ["#FF6384", "#36A2EB"],
+        },
+      ],
+    };
+    setDataChart(setData);
     setChangeWallet(name);
   };
 
@@ -128,6 +126,8 @@ const ExpenseGraph = () => {
               </ButtonGroup>
             </Col>
           </Row>
+        </CardHeader>
+        <CardBody>
           <Row>
             <Col>
               <Pie
@@ -138,7 +138,7 @@ const ExpenseGraph = () => {
               />
             </Col>
           </Row>
-        </CardHeader>
+        </CardBody>
       </Card>
     </div>
   );

@@ -1,7 +1,7 @@
 import React from "react";
 import { Row, Col } from "reactstrap";
-import ExpenseForm from "components/FormExpenses/ExpenseForm";
-import ExpenseGraph from "components/GraphExpenses/ExpenseGraph";
+import ExpenseForm from "components/Expenses/ExpenseForm";
+import ExpenseGraph from "components/Expenses/ExpenseGraph";
 
 const Expenses = () => {
   return (
