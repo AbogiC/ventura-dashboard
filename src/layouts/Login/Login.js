@@ -12,7 +12,7 @@ import {
   MDBCheckbox,
 } from "mdb-react-ui-kit";
 
-import { Button } from "reactstrap";
+import { FormGroup, Input, Button } from "reactstrap";
 
 import {
   signInWithEmailAndPassword,
@@ -84,8 +84,15 @@ function Login() {
         ],
       }),
     })
-      .then(response => response.json())
-      .then(data => console.log(data));
+      .then(r => r.json())
+      .then(data => {
+        // The response comes here
+        console.log(data);
+      })
+      .catch(error => {
+        // Errors are reported there
+        console.log(error);
+      });
   };
 
   const currentDate = new Date();
@@ -112,12 +119,15 @@ function Login() {
     const dateOfBirth = e.target[5].value;
     const password = e.target[6].value;
 
-    const birthFormat = new Date(dateOfBirth);
+    const birthDate = new Date(dateOfBirth);
+    const formattedBirth = new Intl.DateTimeFormat("en-US", options).format(
+      birthDate
+    );
 
     try {
       // create authentication in firebase
       const res = await createUserWithEmailAndPassword(auth, email, password);
-      // don't forget to check rules in cloud firestore
+      // don't forget to update rules firebase
       await setDoc(doc(db, "userProfile", res.user.uid), {
         uid: res.user.uid,
         fullName: fullName,
@@ -125,8 +135,10 @@ function Login() {
         emailAddress: email,
         phoneNumber: phone,
         gender: gender,
-        dateBirth: birthFormat,
-        rowStatus: true,
+        dateBirth: formattedBirth,
+        createdBy: userName,
+        createdDate: formattedDate,
+        rowStatus: 1,
       });
 
       // save user data in google sheets
@@ -305,12 +317,13 @@ function Login() {
               id="phone"
               type="number"
             />
-            <MDBInput
-              wrapperClass="mb-4"
-              label="Gender"
-              id="gender"
-              type="text"
-            />
+            <FormGroup>
+              <Input type="select" name="gender" id="gender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </Input>
+              <label>Gender</label>
+            </FormGroup>
             <MDBInput
               wrapperClass="mb-4"
               label="Date of Birth"

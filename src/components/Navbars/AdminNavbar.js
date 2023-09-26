@@ -15,7 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
+import React, { useEffect } from "react";
 // nodejs library that concatenates classes
 import classNames from "classnames";
 
@@ -44,11 +44,14 @@ import { useContext } from "react";
 
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase";
+import { api } from "api/Api";
+import { personalInfoSheet } from "api/Api";
 
 function AdminNavbar(props) {
   const [collapseOpen, setcollapseOpen] = React.useState(false);
   const [modalSearch, setmodalSearch] = React.useState(false);
   const [color, setcolor] = React.useState("navbar-transparent");
+  const [username, setUsername] = React.useState(null);
   React.useEffect(() => {
     window.addEventListener("resize", updateColor);
     // Specify how to clean up after this effect:
@@ -81,6 +84,20 @@ function AdminNavbar(props) {
   // this function is to get auth from firebase
   const { currentUser } = useContext(AuthContext);
 
+  useEffect(() => {
+    fetch(api + personalInfoSheet)
+      .then(response => response.json())
+      .then(data => {
+        const userRow = data.find(
+          user => user.emailAddress === currentUser.email
+        );
+        setUsername(userRow.userName);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }, [currentUser]);
+
   return (
     <>
       <Navbar className={classNames("navbar-absolute", color)} expand="lg">
@@ -89,15 +106,14 @@ function AdminNavbar(props) {
             <div
               className={classNames("navbar-toggle d-inline", {
                 toggled: props.sidebarOpened,
-              })}
-            >
+              })}>
               <NavbarToggler onClick={props.toggleSidebar}>
                 <span className="navbar-toggler-bar bar1" />
                 <span className="navbar-toggler-bar bar2" />
                 <span className="navbar-toggler-bar bar3" />
               </NavbarToggler>
             </div>
-            <NavbarBrand href="#pablo" onClick={(e) => e.preventDefault()}>
+            <NavbarBrand href="#pablo" onClick={e => e.preventDefault()}>
               {props.brandText}
             </NavbarBrand>
           </div>
@@ -119,8 +135,7 @@ function AdminNavbar(props) {
                   caret
                   color="default"
                   data-toggle="dropdown"
-                  nav
-                >
+                  nav>
                   <div className="notification d-none d-lg-block d-xl-block" />
                   <i className="tim-icons icon-sound-wave" />
                   <p className="d-lg-none">Notifications</p>
@@ -158,13 +173,12 @@ function AdminNavbar(props) {
                   caret
                   color="default"
                   nav
-                  onClick={(e) => e.preventDefault()}
-                >
+                  onClick={e => e.preventDefault()}>
                   <div className="photo">
                     <img alt="..." src={require("assets/img/anime3.png")} />
                   </div>
                   <b className="caret d-none d-lg-block d-xl-block" />
-                  <p className="d-lg-none">{currentUser.email}</p>
+                  <p className="d-lg-none">{username}</p>
                 </DropdownToggle>
                 <DropdownMenu className="dropdown-navbar" right tag="ul">
                   <NavLink tag="li">
@@ -177,8 +191,7 @@ function AdminNavbar(props) {
                   <NavLink tag="li">
                     <DropdownItem
                       className="nav-item"
-                      onClick={() => signOut(auth)}
-                    >
+                      onClick={() => signOut(auth)}>
                       Log out
                     </DropdownItem>
                   </NavLink>
@@ -192,15 +205,13 @@ function AdminNavbar(props) {
       <Modal
         modalClassName="modal-search"
         isOpen={modalSearch}
-        toggle={toggleModalSearch}
-      >
+        toggle={toggleModalSearch}>
         <ModalHeader>
           <Input placeholder="SEARCH" type="text" />
           <button
             aria-label="Close"
             className="close"
-            onClick={toggleModalSearch}
-          >
+            onClick={toggleModalSearch}>
             <i className="tim-icons icon-simple-remove" />
           </button>
         </ModalHeader>
