@@ -169,6 +169,14 @@ const ExpenseForm = () => {
         // The response comes here
         console.log(data);
         setLoading(false);
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Your expense has been saved",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        window.location.reload();
       })
       .catch(error => {
         // Errors are reported there
@@ -196,14 +204,6 @@ const ExpenseForm = () => {
           categoryName,
           expenseType
         );
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "Your expense has been saved",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-        window.location.reload();
       } catch (err) {
         setLoading(false);
       }
