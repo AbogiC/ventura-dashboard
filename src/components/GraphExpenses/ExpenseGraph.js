@@ -35,6 +35,7 @@ const ExpenseGraph = () => {
     "FSA-BCA2",
     "FSA-MAN",
   ];
+  const symbolWallet = ["A", "B", "C", "D", "E", "F"];
 
   // get expense data
   React.useEffect(() => {
@@ -119,9 +120,9 @@ const ExpenseGraph = () => {
                     <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
                       {wallet}
                     </span>
-                    {/* <span className="d-block d-sm-none">
-                      <i className="tim-icons icon-single-02" />
-                    </span> */}
+                    <span className="d-block d-sm-none">
+                      {symbolWallet.at(index)}
+                    </span>
                   </Button>
                 ))}
               </ButtonGroup>
