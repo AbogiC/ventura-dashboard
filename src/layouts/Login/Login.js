@@ -12,7 +12,7 @@ import {
   MDBCheckbox,
 } from "mdb-react-ui-kit";
 
-import { Button } from "reactstrap";
+import { FormGroup, Input, Button } from "reactstrap";
 
 import {
   signInWithEmailAndPassword,
@@ -26,9 +26,8 @@ import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [justifyActive, setJustifyActive] = useState("tab1");
-  const [countData, setCountData] = useState(0);
 
-  const handleJustifyClick = (value) => {
+  const handleJustifyClick = value => {
     if (value === justifyActive) {
       return;
     }
@@ -40,7 +39,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSignIn = async (e) => {
+  const handleSignIn = async e => {
     e.preventDefault();
     const email = e.target[0].value;
     const password = e.target[1].value;
@@ -53,18 +52,6 @@ function Login() {
     }
   };
 
-  // get user total data in google sheet
-  fetch(api)
-    .then((response) => response.json())
-    .then((data) => {
-      const totalData = data.length;
-      setCountData(totalData);
-      console.log(data);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-
   const createGoogleSheet = (
     fullName,
     userName,
@@ -76,31 +63,33 @@ function Login() {
   ) => {
     fetch(api + personalInfoSheet, {
       method: "POST",
-      mode: "cors",
       headers: {
+        Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify([
-        {
-          id: countData + 1,
-          fullName: fullName,
-          userName: userName,
-          emailAddress: email,
-          phoneNumber: phone,
-          gender: gender,
-          dateBirth: dateOfBirth,
-          createdBy: userName,
-          createdDate: createDate,
-          rowStatus: 1,
-        },
-      ]),
+      body: JSON.stringify({
+        data: [
+          {
+            id: "INCREMENT",
+            fullName: fullName,
+            userName: userName,
+            emailAddress: email,
+            phoneNumber: phone,
+            gender: gender,
+            dateBirth: dateOfBirth,
+            createdBy: userName,
+            createdDate: createDate,
+            rowStatus: 1,
+          },
+        ],
+      }),
     })
-      .then((r) => r.json())
-      .then((data) => {
+      .then(r => r.json())
+      .then(data => {
         // The response comes here
         console.log(data);
       })
-      .catch((error) => {
+      .catch(error => {
         // Errors are reported there
         console.log(error);
       });
@@ -119,7 +108,7 @@ function Login() {
     currentDate
   );
 
-  const handleSignUp = async (e) => {
+  const handleSignUp = async e => {
     setLoading(true);
     e.preventDefault();
     const fullName = e.target[0].value;
@@ -175,21 +164,18 @@ function Login() {
       <MDBTabs
         pills
         justify
-        className="mb-3 d-flex flex-row justify-content-between"
-      >
+        className="mb-3 d-flex flex-row justify-content-between">
         <MDBTabsItem>
           <MDBTabsLink
             onClick={() => handleJustifyClick("tab1")}
-            active={justifyActive === "tab1"}
-          >
+            active={justifyActive === "tab1"}>
             Login
           </MDBTabsLink>
         </MDBTabsItem>
         <MDBTabsItem>
           <MDBTabsLink
             onClick={() => handleJustifyClick("tab2")}
-            active={justifyActive === "tab2"}
-          >
+            active={justifyActive === "tab2"}>
             Register
           </MDBTabsLink>
         </MDBTabsItem>
@@ -202,14 +188,12 @@ function Login() {
 
             <div
               className="d-flex justify-content-between mx-auto"
-              style={{ width: "40%" }}
-            >
+              style={{ width: "40%" }}>
               <MDBBtn
                 tag="a"
                 color="none"
                 className="m-1"
-                style={{ color: "#1266f1" }}
-              >
+                style={{ color: "#1266f1" }}>
                 <MDBIcon fab icon="facebook-f" size="sm" />
               </MDBBtn>
 
@@ -217,8 +201,7 @@ function Login() {
                 tag="a"
                 color="none"
                 className="m-1"
-                style={{ color: "#1266f1" }}
-              >
+                style={{ color: "#1266f1" }}>
                 <MDBIcon fab icon="twitter" size="sm" />
               </MDBBtn>
 
@@ -226,8 +209,7 @@ function Login() {
                 tag="a"
                 color="none"
                 className="m-1"
-                style={{ color: "#1266f1" }}
-              >
+                style={{ color: "#1266f1" }}>
                 <MDBIcon fab icon="google" size="sm" />
               </MDBBtn>
 
@@ -235,8 +217,7 @@ function Login() {
                 tag="a"
                 color="none"
                 className="m-1"
-                style={{ color: "#1266f1" }}
-              >
+                style={{ color: "#1266f1" }}>
                 <MDBIcon fab icon="github" size="sm" />
               </MDBBtn>
             </div>
@@ -274,14 +255,12 @@ function Login() {
 
             <div
               className="d-flex justify-content-between mx-auto"
-              style={{ width: "40%" }}
-            >
+              style={{ width: "40%" }}>
               <MDBBtn
                 tag="a"
                 color="none"
                 className="m-1"
-                style={{ color: "#1266f1" }}
-              >
+                style={{ color: "#1266f1" }}>
                 <MDBIcon fab icon="facebook-f" size="sm" />
               </MDBBtn>
 
@@ -289,8 +268,7 @@ function Login() {
                 tag="a"
                 color="none"
                 className="m-1"
-                style={{ color: "#1266f1" }}
-              >
+                style={{ color: "#1266f1" }}>
                 <MDBIcon fab icon="twitter" size="sm" />
               </MDBBtn>
 
@@ -298,8 +276,7 @@ function Login() {
                 tag="a"
                 color="none"
                 className="m-1"
-                style={{ color: "#1266f1" }}
-              >
+                style={{ color: "#1266f1" }}>
                 <MDBIcon fab icon="google" size="sm" />
               </MDBBtn>
 
@@ -307,8 +284,7 @@ function Login() {
                 tag="a"
                 color="none"
                 className="m-1"
-                style={{ color: "#1266f1" }}
-              >
+                style={{ color: "#1266f1" }}>
                 <MDBIcon fab icon="github" size="sm" />
               </MDBBtn>
             </div>
@@ -341,12 +317,13 @@ function Login() {
               id="phone"
               type="number"
             />
-            <MDBInput
-              wrapperClass="mb-4"
-              label="Gender"
-              id="gender"
-              type="text"
-            />
+            <FormGroup>
+              <Input type="select" name="gender" id="gender">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </Input>
+              <label>Gender</label>
+            </FormGroup>
             <MDBInput
               wrapperClass="mb-4"
               label="Date of Birth"

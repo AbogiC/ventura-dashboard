@@ -45,6 +45,7 @@ import { useContext } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase";
 import { api } from "api/Api";
+import { personalInfoSheet } from "api/Api";
 
 function AdminNavbar(props) {
   const [collapseOpen, setcollapseOpen] = React.useState(false);
@@ -84,16 +85,15 @@ function AdminNavbar(props) {
   const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
-    fetch(api)
-      .then((response) => response.json())
-      .then((data) => {
+    fetch(api + personalInfoSheet)
+      .then(response => response.json())
+      .then(data => {
         const userRow = data.find(
-          (user) => user.emailAddress === currentUser.email
+          user => user.emailAddress === currentUser.email
         );
         setUsername(userRow.userName);
-        console.log(data);
       })
-      .catch((error) => {
+      .catch(error => {
         console.error(error);
       });
   }, [currentUser]);
@@ -106,15 +106,14 @@ function AdminNavbar(props) {
             <div
               className={classNames("navbar-toggle d-inline", {
                 toggled: props.sidebarOpened,
-              })}
-            >
+              })}>
               <NavbarToggler onClick={props.toggleSidebar}>
                 <span className="navbar-toggler-bar bar1" />
                 <span className="navbar-toggler-bar bar2" />
                 <span className="navbar-toggler-bar bar3" />
               </NavbarToggler>
             </div>
-            <NavbarBrand href="#pablo" onClick={(e) => e.preventDefault()}>
+            <NavbarBrand href="#pablo" onClick={e => e.preventDefault()}>
               {props.brandText}
             </NavbarBrand>
           </div>
@@ -136,8 +135,7 @@ function AdminNavbar(props) {
                   caret
                   color="default"
                   data-toggle="dropdown"
-                  nav
-                >
+                  nav>
                   <div className="notification d-none d-lg-block d-xl-block" />
                   <i className="tim-icons icon-sound-wave" />
                   <p className="d-lg-none">Notifications</p>
@@ -175,8 +173,7 @@ function AdminNavbar(props) {
                   caret
                   color="default"
                   nav
-                  onClick={(e) => e.preventDefault()}
-                >
+                  onClick={e => e.preventDefault()}>
                   <div className="photo">
                     <img alt="..." src={require("assets/img/anime3.png")} />
                   </div>
@@ -194,8 +191,7 @@ function AdminNavbar(props) {
                   <NavLink tag="li">
                     <DropdownItem
                       className="nav-item"
-                      onClick={() => signOut(auth)}
-                    >
+                      onClick={() => signOut(auth)}>
                       Log out
                     </DropdownItem>
                   </NavLink>
@@ -209,15 +205,13 @@ function AdminNavbar(props) {
       <Modal
         modalClassName="modal-search"
         isOpen={modalSearch}
-        toggle={toggleModalSearch}
-      >
+        toggle={toggleModalSearch}>
         <ModalHeader>
           <Input placeholder="SEARCH" type="text" />
           <button
             aria-label="Close"
             className="close"
-            onClick={toggleModalSearch}
-          >
+            onClick={toggleModalSearch}>
             <i className="tim-icons icon-simple-remove" />
           </button>
         </ModalHeader>
