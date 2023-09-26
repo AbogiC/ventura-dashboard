@@ -40,15 +40,12 @@ const ExpenseTable = ({ totalExpenseData }) => {
     return `${year}-${month}-${day}`;
   };
 
-  const walletNames = [
-    "ABC-BCA",
-    "ABC-BRI",
-    "ABC-BSI",
-    "FSA-BCA1",
-    "FSA-BCA2",
-    "FSA-MAN",
-  ];
-  const symbolWallet = ["A", "B", "C", "D", "E", "F"];
+  const walletABC = ["ABC-BCA", "ABC-BRI", "ABC-BSI", "ABC-CASH"];
+  const walletFSA = ["FSA-BCA1", "FSA-BCA2", "FSA-MAN", "FSA-CASH"];
+  const walletFSABC = ["FSABC-BCA"];
+  const symbolABC = ["A1", "A2", "A3", "A4"];
+  const symbolFSA = ["F1", "F2", "F3", "F4"];
+  const symbolFSABC = ["FA"];
 
   const changeWalletName = name => {
     const filterWallet = totalData.filter(item => item.walletName === name);
@@ -117,7 +114,7 @@ const ExpenseTable = ({ totalExpenseData }) => {
               <ButtonGroup
                 className="btn-group-toggle float-right"
                 data-toggle="buttons">
-                {walletNames.map((wallet, index) => (
+                {walletABC.map((wallet, index) => (
                   <Button
                     tag="label"
                     className={classNames("btn-simple", {
@@ -132,7 +129,53 @@ const ExpenseTable = ({ totalExpenseData }) => {
                       {wallet}
                     </span>
                     <span className="d-block d-sm-none">
-                      {symbolWallet.at(index)}
+                      {symbolABC.at(index)}
+                    </span>
+                  </Button>
+                ))}
+              </ButtonGroup>
+              <ButtonGroup
+                className="btn-group-toggle float-right"
+                data-toggle="buttons">
+                {walletFSA.map((wallet, index) => (
+                  <Button
+                    tag="label"
+                    className={classNames("btn-simple", {
+                      active: changeWallet === wallet,
+                    })}
+                    color="info"
+                    id="0"
+                    size="sm"
+                    onClick={() => changeWalletName(wallet)}
+                    key={index}>
+                    <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
+                      {wallet}
+                    </span>
+                    <span className="d-block d-sm-none">
+                      {symbolFSA.at(index)}
+                    </span>
+                  </Button>
+                ))}
+              </ButtonGroup>
+              <ButtonGroup
+                className="btn-group-toggle float-right"
+                data-toggle="buttons">
+                {walletFSABC.map((wallet, index) => (
+                  <Button
+                    tag="label"
+                    className={classNames("btn-simple", {
+                      active: changeWallet === wallet,
+                    })}
+                    color="info"
+                    id="0"
+                    size="sm"
+                    onClick={() => changeWalletName(wallet)}
+                    key={index}>
+                    <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
+                      {wallet}
+                    </span>
+                    <span className="d-block d-sm-none">
+                      {symbolFSABC.at(index)}
                     </span>
                   </Button>
                 ))}
